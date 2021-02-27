@@ -1,7 +1,7 @@
 {
   "name": "hepayer",
   "version": "0.0.5",
-  "description": "Hive and Hive-Engine payout helper",
+  "description": "Hive and Hive-Engine airdrop helper",
   "main": "index.js",
   "dependencies": {
     "@hiveio/dhive": "^0.14.12",
