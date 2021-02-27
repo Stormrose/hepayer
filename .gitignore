@@ -1,0 +1,7 @@
+node_modules/
+package-lock.json
+.vs
+.vscode
+token_*.json
+!token_TEST_*.json
+*.js.map

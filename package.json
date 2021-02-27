@@ -1,0 +1,27 @@
+{
+  "name": "hepayer",
+  "version": "0.0.5",
+  "description": "Hive and Hive-Engine payout helper",
+  "main": "index.js",
+  "dependencies": {
+    "@hiveio/dhive": "^0.14.12",
+    "axios": "^0.21.1",
+    "dsteem": "^0.11.3",
+    "voca": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^14.14.31",
+    "@types/voca": "^1.4.0",
+    "typescript": "^4.2.2"
+  },
+  "funding": {
+    "type": "buymeberries",
+    "url": "https://buymeberries.com/@eturnerx"
+  },
+  "repository": "github:Stormrose/hepayer",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Emmanuel King Turner <eturnerx@gmail.com> (https://hive.blog/@eturnerx)",
+  "license": "GPL-3.0-only"
+}
