@@ -42,4 +42,4 @@ Please see the example files.
 2. Test run your distribution without an active key to review the distribution schedule before executing the distribution.
 3. Test run your token config.json with a small distribution first. Often 1.0 tokens will be enough for a test run.
 4. The distribution schedule printed when an active key is not supplied is optimised for importing into a spreadsheet. Redirect the output to a `.tsv` or `.txt` file and then open in your favourite programme.
-5. On unix, use the`tee` command to output to a log file and to the console. `x | tee logfile.txt`. In Windows PowerShell you can use `Tee-Object` and in `x | Tee-Object -FilePath "logfile.txt"`
+5. On unix, use the`tee` command to output to a log file and to the console. `x | tee logfile.txt`. In Windows PowerShell you can use `Tee-Object` as in `x | Tee-Object -FilePath "logfile.txt"`
