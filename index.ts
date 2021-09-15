@@ -28,10 +28,12 @@ import voca from 'voca'
     const mintokens: number = parseFloat(config.minholdingtokens)
     const maxtokens: number = parseFloat(config.maxeffectivetokens)
     const minpayout: number = parseFloat(config.minpayout)
+    const mtdp: number = config.membershiptokendecimalplaces ? parseInt(config.membershiptokendecimalplaces) : 3
     const excludemembers: string[] = config.excludemembers ? config.excludemembers : []
     const daccount: string = config.distributionaccount.toLowerCase()
     const dasset: string = config.distributionasset.toUpperCase()
     const dassettype: string = config.distributionassettype.toUpperCase()
+    const dadp: number = config.distributionassetdecimalplaces ? parseInt(config.distributionassetdecimalplaces) : 3
     const distributionamt: number = parseFloat(process.argv[3])
     excludemembers.push(daccount)
     
@@ -54,7 +56,7 @@ import voca from 'voca'
     let activekey: hPrivateKey|sPrivateKey|undefined
     try {
         activekey = process.argv[4] ? isHive(dassettype) ? hPrivateKey.fromString(process.argv[4]) : sPrivateKey.fromString(process.argv[4]) : undefined
-    } catch(e) {
+    } catch(e:any) {
         console.error('ERROR:', e.message)
         console.error('COMMAND LINE ERROR: Check that the private active key is correct.')
         process.exit(-1)
@@ -85,7 +87,7 @@ import voca from 'voca'
         for(const i of tb.data.result) {
             if(
                 !excludemembers.includes(i.account)
-                && (parseFloat(i.balance) >= 0.001 || parseFloat(i.stake) >= 0.001)
+                && (parseFloat(i.balance) >= 0.00000001 || parseFloat(i.stake) >= 0.00000001)
             ) {
                 // console.log('@' + i.account.padEnd(24) + i.balance.padStart(10) + i.stake.padStart(10))
                 const amt: number = parseFloat(i.balance) + parseFloat(i.stake)
@@ -111,9 +113,9 @@ import voca from 'voca'
         if(!activekey) {
             console.log('Account,                      Holding,       Share,      Dist(' + dasset + ')')
             for(const i of Object.keys(tokenholdersdist)) {
-                console.log(voca.sprintf('@%-25s %10.3f, %10.9f, %10.3f', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i]))
+                console.log(voca.sprintf('@%-25s ' + fp(mtdp) + ', %10.9f, ' + fp(dadp), i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i]))
             }
-            console.log(voca.sprintf('%-25s  %10s, %10s , %10.3f', 'TOTAL' + ',', ' ', ' ', accumulatedpayoutamt))    
+            console.log(voca.sprintf('%-25s  %' + (7 + mtdp) + 's, %10s , ' + fp(dadp), 'TOTAL' + ',', ' ', ' ', accumulatedpayoutamt))    
         }
 
         // If the cmdline has an active key then attempt to do the distributions
@@ -136,8 +138,8 @@ import voca from 'voca'
                             (<any>activekey)
                         )
                         tokenholdersdistresult[i] = true
-                        console.log(voca.sprintf('@%-25s %10.3f, %10.9f, %10.3f, %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'DONE'))
-                    } catch(e) {
+                        console.log(voca.sprintf('@%-25s ' + fp(mtdp) + ', %10.9f, ' + fp(dadp) + ', %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'DONE'))
+                    } catch(e:any) {
                         console.log('@' + i, e.message)
                         tokenholdersdistresult[i] = false
                         hasfails = true
@@ -158,7 +160,7 @@ import voca from 'voca'
                                     contractPayload: {
                                         symbol: dasset,
                                         to: i,
-                                        quantity: tokenholdersdist[i].toFixed(3),
+                                        quantity: tokenholdersdist[i].toFixed(dadp),
                                         memo: 'Distribution for ' + tokensymbol
                                     }
                                 })
@@ -166,8 +168,8 @@ import voca from 'voca'
                             (<any>activekey)
                         )
                         tokenholdersdistresult[i] = true
-                        console.log(voca.sprintf('@%-25s %10.3f, %10.9f, %10.3f, %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'DONE'))
-                    } catch(e) {
+                        console.log(voca.sprintf('@%-25s ' + fp(mtdp) + ', %10.9f, ' + fp(dadp) + ', %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'DONE'))
+                    } catch(e:any) {
                         console.log('@' + i, e.message)
                         tokenholdersdistresult[i] = false
                         hasfails = true
@@ -182,7 +184,7 @@ import voca from 'voca'
                 console.log('\n\n\Fails')
                 for(const i of Object.keys(tokenholdersdistresult)) {
                     if(!tokenholdersdistresult[i]) {
-                        console.log(voca.sprintf('@%-25s %10.3f, %10.9f, %10.3f, %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'FAIL'))
+                        console.log(voca.sprintf('@%-25s ' + fp(mtdp) + ', %10.9f, ' + fp(dadp) + ', %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'FAIL'))
                     }
                 }
             } else {
@@ -198,6 +200,8 @@ import voca from 'voca'
 function isHive(dassettype: string): boolean {
     return dassettype === 'HIVE' || dassettype === 'HIVE-ENGINE'
 }
+
+function fp(dp: number): string { return '%' + (7 + dp) + '.' + dp + 'f' }
 
 async function sleep(milliseconds: number): Promise<void> { 
     return new Promise<void>(resolve => {

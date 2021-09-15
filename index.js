@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -35,13 +54,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (Object.hasOwnProperty.call(mod, k)) result[k] = mod[k];
-    result["default"] = mod;
-    return result;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -52,7 +64,7 @@ var dhive_1 = require("@hiveio/dhive");
 var dsteem_1 = require("dsteem");
 var voca_1 = __importDefault(require("voca"));
 (function () { return __awaiter(void 0, void 0, void 0, function () {
-    var config, tokensymbol, mintokens, maxtokens, minpayout, excludemembers, daccount, dasset, dassettype, distributionamt, activekey, hefindtemplate, axoptions, hefindstr, tokenholdersraw, tokenholdersnorm, tokenholdersdist, tokenholdersdistresult, accumulatedtokenbalance, accumulatedpayoutamt, tb, _i, _a, i, amt, _b, _c, i, amt, _d, _e, i, hclient, hasfails, _f, _g, i, e_1, _h, _j, i, e_2, _k, _l, i, e_3;
+    var config, tokensymbol, mintokens, maxtokens, minpayout, mtdp, excludemembers, daccount, dasset, dassettype, dadp, distributionamt, activekey, hefindtemplate, axoptions, hefindstr, tokenholdersraw, tokenholdersnorm, tokenholdersdist, tokenholdersdistresult, accumulatedtokenbalance, accumulatedpayoutamt, tb, _i, _a, i, amt, _b, _c, i, amt, _d, _e, i, hclient, hasfails, _f, _g, i, e_1, _h, _j, i, e_2, _k, _l, i, e_3;
     return __generator(this, function (_m) {
         switch (_m.label) {
             case 0:
@@ -75,10 +87,12 @@ var voca_1 = __importDefault(require("voca"));
                 mintokens = parseFloat(config.minholdingtokens);
                 maxtokens = parseFloat(config.maxeffectivetokens);
                 minpayout = parseFloat(config.minpayout);
+                mtdp = config.membershiptokendecimalplaces ? parseInt(config.membershiptokendecimalplaces) : 3;
                 excludemembers = config.excludemembers ? config.excludemembers : [];
                 daccount = config.distributionaccount.toLowerCase();
                 dasset = config.distributionasset.toUpperCase();
                 dassettype = config.distributionassettype.toUpperCase();
+                dadp = config.distributionassetdecimalplaces ? parseInt(config.distributionassetdecimalplaces) : 3;
                 distributionamt = parseFloat(process.argv[3]);
                 excludemembers.push(daccount);
                 if (!tokensymbol || tokensymbol.length < 1
@@ -121,7 +135,7 @@ var voca_1 = __importDefault(require("voca"));
                 for (_i = 0, _a = tb.data.result; _i < _a.length; _i++) {
                     i = _a[_i];
                     if (!excludemembers.includes(i.account)
-                        && (parseFloat(i.balance) >= 0.001 || parseFloat(i.stake) >= 0.001)) {
+                        && (parseFloat(i.balance) >= 0.00000001 || parseFloat(i.stake) >= 0.00000001)) {
                         amt = parseFloat(i.balance) + parseFloat(i.stake);
                         if (amt >= mintokens) {
                             tokenholdersraw[i.account] = amt;
@@ -142,9 +156,9 @@ var voca_1 = __importDefault(require("voca"));
                 console.log('Account,                      Holding,       Share,      Dist(' + dasset + ')');
                 for (_d = 0, _e = Object.keys(tokenholdersdist); _d < _e.length; _d++) {
                     i = _e[_d];
-                    console.log(voca_1["default"].sprintf('@%-25s %10.3f, %10.9f, %10.3f', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i]));
+                    console.log(voca_1["default"].sprintf('@%-25s ' + fp(mtdp) + ', %10.9f, ' + fp(dadp), i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i]));
                 }
-                console.log(voca_1["default"].sprintf('%-25s  %10s, %10s , %10.3f', 'TOTAL' + ',', ' ', ' ', accumulatedpayoutamt));
+                console.log(voca_1["default"].sprintf('%-25s  %' + (7 + mtdp) + 's, %10s , ' + fp(dadp), 'TOTAL' + ',', ' ', ' ', accumulatedpayoutamt));
                 return [3, 24];
             case 4:
                 hclient = isHive(dassettype) ? new dhive_1.Client(config.blockchainapinode) : new dsteem_1.Client(config.blockchainapinode);
@@ -169,7 +183,7 @@ var voca_1 = __importDefault(require("voca"));
             case 7:
                 _m.sent();
                 tokenholdersdistresult[i] = true;
-                console.log(voca_1["default"].sprintf('@%-25s %10.3f, %10.9f, %10.3f, %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'DONE'));
+                console.log(voca_1["default"].sprintf('@%-25s ' + fp(mtdp) + ', %10.9f, ' + fp(dadp) + ', %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'DONE'));
                 return [3, 9];
             case 8:
                 e_1 = _m.sent();
@@ -205,7 +219,7 @@ var voca_1 = __importDefault(require("voca"));
                             contractPayload: {
                                 symbol: dasset,
                                 to: i,
-                                quantity: tokenholdersdist[i].toFixed(3),
+                                quantity: tokenholdersdist[i].toFixed(dadp),
                                 memo: 'Distribution for ' + tokensymbol
                             }
                         })
@@ -213,7 +227,7 @@ var voca_1 = __importDefault(require("voca"));
             case 16:
                 _m.sent();
                 tokenholdersdistresult[i] = true;
-                console.log(voca_1["default"].sprintf('@%-25s %10.3f, %10.9f, %10.3f, %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'DONE'));
+                console.log(voca_1["default"].sprintf('@%-25s ' + fp(mtdp) + ', %10.9f, ' + fp(dadp) + ', %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'DONE'));
                 return [3, 18];
             case 17:
                 e_2 = _m.sent();
@@ -239,7 +253,7 @@ var voca_1 = __importDefault(require("voca"));
                     for (_k = 0, _l = Object.keys(tokenholdersdistresult); _k < _l.length; _k++) {
                         i = _l[_k];
                         if (!tokenholdersdistresult[i]) {
-                            console.log(voca_1["default"].sprintf('@%-25s %10.3f, %10.9f, %10.3f, %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'FAIL'));
+                            console.log(voca_1["default"].sprintf('@%-25s ' + fp(mtdp) + ', %10.9f, ' + fp(dadp) + ', %4s', i + ',', tokenholdersraw[i], tokenholdersnorm[i], tokenholdersdist[i], 'FAIL'));
                         }
                     }
                 }
@@ -260,6 +274,7 @@ var voca_1 = __importDefault(require("voca"));
 function isHive(dassettype) {
     return dassettype === 'HIVE' || dassettype === 'HIVE-ENGINE';
 }
+function fp(dp) { return '%' + (7 + dp) + '.' + dp + 'f'; }
 function sleep(milliseconds) {
     return __awaiter(this, void 0, void 0, function () {
         return __generator(this, function (_a) {
